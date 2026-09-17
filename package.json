@@ -1,0 +1,45 @@
+{
+  "name": "opencode-zai-quota",
+  "version": "1.0.0",
+  "description": "OpenCode TUI plugin - Z.AI coding plan quota gauges (5h window + plan) in the sidebar",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/josvaal/opencode-zai-quota.git"
+  },
+  "homepage": "https://github.com/josvaal/opencode-zai-quota#readme",
+  "bugs": {
+    "url": "https://github.com/josvaal/opencode-zai-quota/issues"
+  },
+  "type": "module",
+  "exports": {
+    "./tui": "./dist/tui.tsx"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "pack:dry": "npm pack --dry-run"
+  },
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "tui",
+    "sidebar",
+    "zai",
+    "z-ai",
+    "quota",
+    "usage"
+  ],
+  "license": "MIT",
+  "engines": {
+    "opencode": ">=1.18.0"
+  },
+  "dependencies": {
+    "@opencode-ai/plugin": "^1.18.0",
+    "@opentui/core": "^0.4.2",
+    "@opentui/solid": "^0.4.2",
+    "solid-js": "^1.9.12"
+  }
+}
