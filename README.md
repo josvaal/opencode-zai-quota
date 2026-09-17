@@ -20,11 +20,21 @@ the limits.
 
 ## Install
 
-```sh
-npm install -g opencode-zai-quota
-```
+OpenCode TUI plugins are not auto-discovered: installing the package only
+downloads it — the plugin must also be **registered** in `tui.json`. Two ways:
 
-Or add it to `~/.config/opencode/tui.json` (project `.opencode/tui.json` also works):
+### Option 1 — Plugin manager inside OpenCode (recommended)
+
+1. `npm install -g opencode-zai-quota`
+2. Open OpenCode, press `ctrl+p` and run **plugin install** (or open the
+   plugin manager and add `opencode-zai-quota`).
+3. The plugin manager writes the entry to `tui.json` for you. Restart OpenCode.
+
+### Option 2 — Manual registration
+
+1. `npm install -g opencode-zai-quota`
+2. Add the plugin to `~/.config/opencode/tui.json` (a project-level
+   `.opencode/tui.json` also works):
 
 ```json
 {
@@ -33,7 +43,12 @@ Or add it to `~/.config/opencode/tui.json` (project `.opencode/tui.json` also wo
 }
 ```
 
-Then restart OpenCode.
+3. Restart OpenCode. The `Z.AI PLAN` panel appears in the session sidebar and
+   the `zai:N%` chip next to the prompt input.
+
+> Editing `tui.json` requires a restart: config is not hot-reloaded. Unknown
+> top-level keys in `tui.json` are rejected and will crash startup — keep the
+> shape shown above.
 
 ## Authentication
 
