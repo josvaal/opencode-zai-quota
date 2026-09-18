@@ -116,9 +116,42 @@ const tui: TuiPlugin = async (api) => {
   await refresh()
   const interval = setInterval(refresh, REFRESH_MS)
   const offIdle = api.event.on("session.idle", () => void refresh())
+
+  // Quota-exhaustion guard: when the provider kills the stream with
+  // "Weekly/Monthly Limit Exhausted", the turn hangs in the TUI (looks frozen).
+  // Detect the session.error, surface a toast with the reset time, refresh the
+  // gauges, and abort the stuck turn so the UI unfreezes immediately.
+  const handledQuotaAborts = new Set<string>()
+  const offStreamError = api.event.on("session.error", (evt: any) => {
+    const props = evt?.properties ?? {}
+    const err: any = props.error
+    const message = String(err?.data?.message ?? err?.message ?? "")
+    if (!/limit\s+exhausted/i.test(message)) return
+    const sessionID = String(props.sessionID ?? "")
+    if (sessionID && handledQuotaAborts.has(sessionID)) return
+    if (sessionID) handledQuotaAborts.add(sessionID)
+    const resetMatch = message.match(/reset\s+at\s+([0-9]{4}-[0-9]{2}-[0-9]{2}[^"']*?)(?:["']|$)/i)
+    const resetAt = resetMatch?.[1]?.trim()
+    void refresh()
+    api.ui.toast({
+      variant: "error",
+      title: "Z.AI quota exhausted",
+      message: resetAt
+        ? `Limit reached — resets ${resetAt}. Turn aborted; switch model with /models to keep working.`
+        : `Limit reached. Turn aborted; switch model with /models to keep working. (${message.slice(0, 120)})`,
+      duration: 20000,
+    })
+    if (sessionID) {
+      api.client.session
+        .abort({ sessionID } as any)
+        .catch(() => {})
+    }
+  })
+
   onCleanup(() => {
     clearInterval(interval)
     offIdle()
+    offStreamError()
   })
   api.lifecycle.onDispose(() => clearInterval(interval))
 

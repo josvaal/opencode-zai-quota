@@ -1,6 +1,6 @@
 {
   "name": "opencode-zai-quota",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "OpenCode TUI plugin - Z.AI coding plan quota gauges (5h window + plan) in the sidebar",
   "repository": {
     "type": "git",
