@@ -249,25 +249,35 @@ const tui: TuiPlugin = async (api) => {
     },
   })
 
-  const disposeCommands = api.command.register(() => [
-    {
-      title: "Z.AI quota: refresh now",
-      value: "zai-quota.refresh",
-      description: "Fetch current zai-coding-plan usage from the Z.AI API",
-      category: "Z.AI",
-      slash: { name: "zai-quota", aliases: ["zq"] },
-      onSelect: async () => {
-        await refresh()
-        const current = rows()
-        api.ui.toast({
-          variant: error() ? "error" : "success",
-          title: "Z.AI quota",
-          message: error() ?? current.map((r) => `${r.label}: ${fmt(r.usage)}/${fmt(r.limit)}`).join(" | "),
-          duration: 4000,
-        })
+  // Registered via api.keymap.registerLayer (the current TUI command API);
+  // the legacy api.command.register is deprecated and will be removed in v2.
+  // Field mapping follows opencode's own compat shim (command-shim.ts):
+  // value -> name, description -> desc, slash.name/aliases -> slashName/slashAliases,
+  // onSelect -> run.
+  const disposeCommands = api.keymap.registerLayer({
+    commands: [
+      {
+        namespace: "palette",
+        name: "zai-quota.refresh",
+        title: "Z.AI quota: refresh now",
+        desc: "Fetch current zai-coding-plan usage from the Z.AI API",
+        category: "Z.AI",
+        slashName: "zai-quota",
+        slashAliases: ["zq"],
+        run: async () => {
+          await refresh()
+          const current = rows()
+          api.ui.toast({
+            variant: error() ? "error" : "success",
+            title: "Z.AI quota",
+            message: error() ?? current.map((r) => `${r.label}: ${fmt(r.usage)}/${fmt(r.limit)}`).join(" | "),
+            duration: 4000,
+          })
+        },
       },
-    },
-  ])
+    ],
+    bindings: [],
+  })
 
   api.lifecycle.onDispose(() => {
     disposeCommands()
